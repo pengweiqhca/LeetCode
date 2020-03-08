@@ -1,0 +1,12 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <NETCoreAppVersion>netcoreapp3.1</NETCoreAppVersion>
+    <NETFrameworkVersion>net48</NETFrameworkVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.*" PrivateAssets="All" Condition="'$(OS)' != 'Windows_NT'" />
+  </ItemGroup>
+
+</Project>

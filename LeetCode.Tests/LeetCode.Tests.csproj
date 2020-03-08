@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(NETCoreAppVersion);$(NETFrameworkVersion)</TargetFrameworks>
+
+    <IsPackable>false</IsPackable>
+
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.DotMemoryUnit" Version="3.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="xunit" Version="2.*" />
+    <PackageReference Include="Xunit.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Xunit.DependencyInjection.Logging" Version="2.1.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+    <PackageReference Include="coverlet.collector" Version="1.*" />
+
+    <ProjectReference Include="..\LeetCode\LeetCode.csproj" />
+  </ItemGroup>
+
+</Project>
