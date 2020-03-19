@@ -22,6 +22,305 @@ namespace LeetCode.Tests
         public void LeetCode10Test(bool result, string s, string p) => Assert.Equal(result, new LeetCode10().IsMatch(s, p));
 
         [Theory]
+        [MemberData(nameof(LeetCode19Data))]
+        public void LeetCode19Test(ListNode head, int n, ListNode b)
+        {
+            var a = new LeetCode19().RemoveNthFromEnd(head, n);
+
+            while (a != null && b != null)
+            {
+                Assert.Equal(b.val, a.val);
+                a = a.next;
+                b = b.next;
+            }
+
+            Assert.True(a == null && b == null);
+        }
+
+        public static IEnumerable<object[]> LeetCode19Data()
+        {
+            yield return new object[]
+            {
+                new ListNode(1),
+                1,
+                null
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+                1,
+                new ListNode(1)
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+                2,
+                new ListNode(2)
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+                3,
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                    }
+                },
+                1,
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                    }
+                },
+                2,
+                new ListNode(1)
+                {
+                    next = new ListNode(3)
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                    }
+                },
+                3,
+                new ListNode(2)
+                {
+                    next = new ListNode(3)
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                        {
+                            next = new ListNode(4)
+                            {
+                                next = new ListNode(5)
+                            }
+                        }
+                    }
+                },
+                2,
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                        {
+                            next = new ListNode(5)
+                        }
+                    }
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                        {
+                            next = new ListNode(4)
+                            {
+                                next = new ListNode(5)
+                            }
+                        }
+                    }
+                },
+                1,
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                        {
+                            next = new ListNode(4)
+                        }
+                    }
+                },
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(LeetCode21Data))]
+        public void LeetCode21Test(ListNode l1, ListNode l2, ListNode b)
+        {
+            var a = new LeetCode21().MergeTwoLists(l1, l2);
+
+            while (a != null && b != null)
+            {
+                Assert.Equal(b.val, a.val);
+                a = a.next;
+                b = b.next;
+            }
+
+            Assert.True(a == null && b == null);
+        }
+
+        public static IEnumerable<object[]> LeetCode21Data()
+        {
+            yield return new object[]
+            {
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(4)
+                    }
+                },
+                new ListNode(1)
+                {
+                    next = new ListNode(3)
+                    {
+                        next = new ListNode(4)
+                    }
+                },
+                new ListNode(1)
+                {
+                    next = new ListNode(1)
+                    {
+                        next = new ListNode(2)
+                        {
+                            next = new ListNode(3)
+                            {
+                                next = new ListNode(4)
+                                {
+                                    next = new ListNode(4)
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(1),
+                new ListNode(2),
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                },
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(LeetCode23Data))]
+        public void LeetCode23Test(ListNode[] list, ListNode b)
+        {
+            var a = new LeetCode23().MergeKLists(list);
+
+            while (a != null && b != null)
+            {
+                Assert.Equal(b.val, a.val);
+                a = a.next;
+                b = b.next;
+            }
+
+            Assert.True(a == null && b == null);
+        }
+
+        public static IEnumerable<object[]> LeetCode23Data()
+        {
+            yield return new object[]
+            {
+                new[]
+                {
+                    new ListNode(1)
+                    {
+                        next = new ListNode(4)
+                        {
+                            next = new ListNode(5)
+                        }
+                    },
+                    new ListNode(1)
+                    {
+                        next = new ListNode(3)
+                        {
+                            next = new ListNode(4)
+                        }
+                    },
+                    new ListNode(2)
+                    {
+                        next = new ListNode(6)
+                    },
+                },
+                new ListNode(1)
+                {
+                    next = new ListNode(1)
+                    {
+                        next = new ListNode(2)
+                        {
+                            next = new ListNode(3)
+                            {
+                                next = new ListNode(4)
+                                {
+                                    next = new ListNode(4)
+                                    {
+                                        next = new ListNode(5)
+                                        {
+                                            next = new ListNode(6)
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+            yield return new object[]
+            {
+                new[]
+                {
+                    new ListNode(1),
+                    new ListNode(2),
+                    new ListNode(3),
+                },
+                new ListNode(1)
+                {
+                    next = new ListNode(2)
+                    {
+                        next = new ListNode(3)
+                    }
+                },
+            };
+        }
+
+        [Theory]
         [InlineData(0, new int[] { })]
         [InlineData(0, new[] { 0 })]
         [InlineData(0, new[] { 0, 0 })]

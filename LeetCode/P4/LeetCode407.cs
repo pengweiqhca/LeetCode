@@ -28,221 +28,190 @@ namespace LeetCode.P4
                 }
             }
 
-            ComputeX(height, xLength, yLength);
-            ComputeY(height, xLength, yLength);
-            Dump(height, xLength, yLength);
-            ComputeHeight(height, xLength, yLength);
-            Dump(height, xLength, yLength);
+            var numberLength = (int)Math.Log10(heightMap.SelectMany(_ => _).Max()) + 1;
+            //Dump(height, numberLength, xLength, yLength);
 
-            var total = 0;
+            ComputeWall(height, xLength, yLength);
 
+            //Dump(height, numberLength, xLength, yLength);
+
+            return (from PositionInfo p in height where p.Height > p.Value select p.Height - p.Value).Sum();
+        }
+
+        void ComputeWall(PositionInfo[,] heightMap, int xLength, int yLength)
+        {
             for (var x = 1; x < xLength - 1; x++)
                 for (var y = 1; y < yLength - 1; y++)
                 {
-                    var position = height[x, y];
-                    total += Math.Max(0, position.Height - position.Value);
-                }
+                    var position = heightMap[x, y];
+                    if (position.Height >= 0) continue;
 
-            return total;
+                    position = FindLowLying(heightMap, xLength, yLength, position);
+
+                    if (position == null || position.Height >= 0) continue;
+
+                    ComputePoint(heightMap, xLength, yLength, null,
+                        new SortedSet<PositionInfo>(),
+                        new SortedSet<PositionInfo>(new PositionInfoValueComparer()),
+                        new HashSet<PositionInfo> { position });
+                }
         }
 
-        private static void ComputeX(PositionInfo[,] height, int xLength, int yLength)
+        /// <summary>通过当前点查找最低点</summary>
+        PositionInfo FindLowLying(PositionInfo[,] heightMap, int xLength, int yLength, PositionInfo position)
         {
-            for (var x = 0; x < xLength; x++)
+            var computing = new HashSet<PositionInfo>();
+            while (true)
             {
-                int start = -1, end = -1;
+                computing.Add(position);
 
-                for (var y = 0; y < yLength; y++)
+                var edges = new SortedSet<PositionInfo>(new PositionInfoValueComparer());
+                foreach (var b in Bounds)
                 {
-                    if (start < 0)
-                    {
-                        if (height[x, y].Value > 0) start = y;
-                    }
-                    else if (height[x, y].Value >= height[x, start].Value)
-                    {
-                        for (var index = start + 1; index < y; index++)
-                        {
-                            height[x, index].XHeight = height[x, start].Value;
-                        }
-
-                        start = y;
-                    }
+                    edges.Add(heightMap[position.X + b[0], position.Y + b[1]]);
                 }
 
-                if (start < 0) return;
-
-                for (var y = yLength - 1; y >= start; y--)
+                var min = edges.First(p => !computing.Contains(p));
+                if (min.Value > position.Value) return position;
+                if (min.Height >= 0)
                 {
-                    if (end < 0)
+                    position.Height = min.Height;
+                    return null;
+                }
+                if (min.X < 1 || min.Y < 1 || min.X > xLength - 2 || min.Y > yLength - 2)
+                {
+                    foreach (var p in computing)
                     {
-                        if (height[x, y].Value > 0) end = y;
+                        p.Height = p.Value; //如果找不到，则整个线上都是最小
                     }
-                    else if (height[x, y].Value >= height[x, end].Value)
+
+                    return null;
+                }
+                position = min;
+            }
+        }
+
+        private static readonly int[][] Bounds = { new[] { 0, -1 }, new[] { 0, 1 }, new[] { -1, 0 }, new[] { 1, 0 } };
+
+        /// <summary>计算低点的高度</summary>
+        int ComputePoint(PositionInfo[,] heightMap, int xLength, int yLength, int? minHeight,
+            ISet<PositionInfo> computing,
+            ISet<PositionInfo> edges,
+            ISet<PositionInfo> lowLying)
+        {
+            foreach (var ll in lowLying)
+            {
+                foreach (var b in Bounds)
+                    edges.Add(heightMap[ll.X + b[0], ll.Y + b[1]]);
+
+                computing.Add(ll);
+            }
+
+            var height = ComputeWall(heightMap, xLength, yLength, minHeight, computing, edges, lowLying);
+            foreach (var position in lowLying)
+            {
+                if (position.Height < height) position.Height = height;
+            }
+            return height;
+        }
+
+        /// <summary>循环计算池的高度</summary>
+        int ComputeWall(PositionInfo[,] heightMap, int xLength, int yLength, int? minHeight,
+            ISet<PositionInfo> computing,
+            ISet<PositionInfo> edges,
+            ISet<PositionInfo> lowLying)
+        {
+            while (true)
+            {
+                var min = edges.FirstOrDefault(p => !computing.Contains(p));
+                if (min == null) return int.MaxValue;
+
+                if (minHeight.HasValue && min.Value >= minHeight) return minHeight.Value;
+
+                var height = ComputeHeight(heightMap, xLength, yLength, min, computing, edges, lowLying);
+                if (height >= 0)
+                {
+                    if (height > minHeight.GetValueOrDefault(height))
                     {
-                        for (var index = y + 1; index < end; index++)
+                        foreach (var ll in lowLying)
                         {
-                            height[x, index].XHeight = height[x, end].Value;
+                            if (ll.Height >= 0 && ll.Height != height) throw new Exception($"池高错误：{ll}:{ll.Height}新{height}");
+                            if (ll.Value < height) ll.Height = height;
+                            else throw new Exception($"池高错误：{ll}:{ll.Value}大于等于{height}");
                         }
 
-                        end = y;
+                        foreach (var ll in edges)
+                        {
+                            if (ll.Height >= 0 && ll.Height != height) throw new Exception($"池高错误：{ll}:{ll.Height}新{height}");
+                            if (ll.Value >= height) ll.Height = height;
+                            else throw new Exception($"边高错误：{ll}:{ll.Value}小于{height}");
+                        }
                     }
+
+                    return height;
                 }
             }
         }
 
-        private static void ComputeY(PositionInfo[,] height, int xLength, int yLength)
+        /// <summary>计算点的高度</summary>
+        int ComputeHeight(PositionInfo[,] heightMap, int xLength, int yLength, PositionInfo position,
+            ISet<PositionInfo> computing,
+            ISet<PositionInfo> edges,
+            ISet<PositionInfo> lowLying)
         {
-            for (var y = 0; y < yLength; y++)
+            if (position.X < 1 || position.Y < 1 || position.X > xLength - 2 || position.Y > yLength - 2) return position.Value;
+
+            computing.Add(position);
+
+            if (position.Height >= position.Value) return position.Height;
+
+            var e1 = new SortedSet<PositionInfo>();
+            var l1 = new List<PositionInfo>();
+
+            foreach (var b in Bounds)
             {
-                int start = -1, end = -1;
+                var p = heightMap[position.X + b[0], position.Y + b[1]];
+                if (computing.Contains(p)) continue;
 
-                for (var x = 0; x < xLength; x++)
+                if (position.Value <= p.Value)
                 {
-                    if (start < 0)
-                    {
-                        if (height[x, y].Value > 0) start = x;
-                    }
-                    else if (height[x, y].Value >= height[start, y].Value)
-                    {
-                        for (var index = start + 1; index < x; index++)
-                        {
-                            height[index, y].YHeight = height[start, y].Value;
-                        }
-
-                        start = x;
-                    }
+                    edges.Add(p);
                 }
-
-                if (start < 0) return;
-
-                for (var x = xLength - 1; x >= start; x--)
+                else
                 {
-                    if (end < 0)
+                    if (p.X < 1 || p.Y < 1 || p.X > xLength - 2 || p.Y > yLength - 2)
                     {
-                        if (height[x, y].Value > 0) end = x;
+                        //如果p是边点时且小于当前点，则当前点为墙
+                        if (position.Value > p.Value) return position.Value;
                     }
-                    else if (height[x, y].Value >= height[end, y].Value)
+                    else
                     {
-                        for (var index = x + 1; index < end; index++)
-                        {
-                            height[index, y].YHeight = height[end, y].Value;
-                        }
+                        var ll = FindLowLying(heightMap, xLength, yLength, p);
+                        //找不到最低点则当前点为墙
+                        if (ll == null) return position.Value;
 
-                        end = x;
+                        var e2 = new SortedSet<PositionInfo>(new PositionInfoValueComparer());
+                        var l2 = new SortedSet<PositionInfo> { ll };
+
+                        //当前点是另一低点的墙时，则当前低点计算完成
+                        if (position.Value > ComputePoint(heightMap, xLength, yLength, position.Value, computing, e2, l2)) return position.Value;
+
+                        foreach (var a in e2) if (!l1.Contains(a)) e1.Add(a);
+                        foreach (var a in l2) if (!e1.Contains(a)) l1.Add(a);
                     }
                 }
             }
+
+            foreach (var a in e1) edges.Add(a);
+            foreach (var a in l1) lowLying.Add(a);
+
+            lowLying.Add(position);
+            edges.Remove(position);
+
+            return -1;
         }
 
-        private static void ComputeHeight(PositionInfo[,] height, int xLength, int yLength)
-        {
-            bool hasUpdated;
-            do
-            {
-                hasUpdated = false;
-
-                for (var x = 1; x < xLength - 1; x++)
-                {
-                    for (var y = 1; y < yLength - 1; y++)
-                    {
-                        var position = height[x, y];
-                        if (!IsPool(position)) continue;
-
-                        var area = new List<PositionInfo> { position };
-                        var cache = new HashSet<PositionInfo>();
-
-                        var length = 0;
-                        while (length < area.Count)
-                        {
-                            var rawLength = area.Count;
-
-                            for (var index = length; index < rawLength; index++)
-                            {
-                                position = area[index];
-
-                                if (position.X > 1) TryAdd(height[position.X - 1, position.Y], area, cache);
-                                if (position.X < xLength - 1) TryAdd(height[position.X + 1, position.Y], area, cache);
-                                if (position.Y > 1) TryAdd(height[position.X, position.Y - 1], area, cache);
-                                if (position.Y < yLength - 1) TryAdd(height[position.X, position.Y + 1], area, cache);
-                            }
-
-                            length = rawLength;
-                        }
-
-                        var min = area.Min(p =>
-                        {
-                            var v = p.Height;
-                            position = height[p.X - 1, p.Y];
-                            if (!cache.Contains(position)) v = Math.Min(position.Value, v);
-                            position = height[p.X + 1, p.Y];
-                            if (!cache.Contains(position)) v = Math.Min(position.Value, v);
-                            position = height[p.X, p.Y - 1];
-                            if (!cache.Contains(position)) v = Math.Min(position.Value, v);
-                            position = height[p.X, p.Y + 1];
-                            if (!cache.Contains(position)) v = Math.Min(position.Value, v);
-
-                            if (v <= p.Value)
-                            {
-                                p.Height = 0;
-                                hasUpdated = true;
-                            }
-                            if (v < p.Height)
-                            {
-                                p.Height = v;
-                                hasUpdated = true;
-                            }
-
-                            return v;
-                        });
-
-                        if (hasUpdated) break;
-
-                        if (area.Count > 1)
-                        {
-                            var processed = new HashSet<PositionInfo>();
-                            hasUpdated = Sync(height, processed, area.First(p => p.Height == min));
-                            if (hasUpdated) break;
-                        }
-                    }
-
-                    if (hasUpdated) break;
-                }
-            } while (hasUpdated);
-        }
-
-        private static bool Sync(PositionInfo[,] height, ISet<PositionInfo> processed, PositionInfo position) =>
-            Sync2(height, processed, height[position.X - 1, position.Y], position) ||
-            Sync2(height, processed, height[position.X + 1, position.Y], position) ||
-            Sync2(height, processed, height[position.X, position.Y - 1], position) ||
-            Sync2(height, processed, height[position.X, position.Y + 1], position);
-
-        private static bool Sync2(PositionInfo[,] height, ISet<PositionInfo> processed, PositionInfo position1, PositionInfo position2)
-        {
-            if (processed.Contains(position1) || !IsPool(position1) || position1.Height <= position2.Height) return false;
-
-            processed.Add(position1);
-
-            if (position1.Value >= position2.Height)
-            {
-                position1.Height = 0;
-                return false;
-            }
-
-            position1.Height = position2.Height;
-
-            return Sync(height, processed, position1);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static void TryAdd(PositionInfo position, ICollection<PositionInfo> area, ISet<PositionInfo> cache)
-        {
-            if (IsPool(position) && cache.Add(position)) area.Add(position);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool IsPool(PositionInfo position) => position.XHeight > 0 && position.YHeight > 0;
-
-        class PositionInfo
+        class PositionInfo : IComparable<PositionInfo>, IComparable
         {
             public PositionInfo(int value, int x, int y)
             {
@@ -254,19 +223,52 @@ namespace LeetCode.P4
             public int Value { get; }
             public int X { get; }
             public int Y { get; }
-            public int XHeight { get; set; }
-            public int YHeight { get; set; }
+            public int Height { get; set; } = -1;
 
-            public int Height
+            public override string ToString() => $"{X},{Y},{Value}";
+
+            public int CompareTo(PositionInfo other)
             {
-                get => XHeight > 0 && YHeight > 0 ? Math.Min(XHeight, YHeight) : 0;
-                set => XHeight = YHeight = value;
+                if (ReferenceEquals(this, other)) return 0;
+                if (other is null) return 1;
+                var xComparison = X.CompareTo(other.X);
+                if (xComparison != 0) return xComparison;
+                return Y.CompareTo(other.Y);
             }
 
-            public override string ToString() => Value.ToString();
+            public int CompareTo(object obj)
+            {
+                if (obj is null) return 1;
+                if (ReferenceEquals(this, obj)) return 0;
+                return obj is PositionInfo other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(PositionInfo)}");
+            }
+
+            public override bool Equals(object obj) => CompareTo(obj) == 0;
+
+            public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
         }
 
-        private void Dump(PositionInfo[,] map, int xLength, int yLength)
+        class PositionInfoValueComparer : IComparer<PositionInfo>
+        {
+            public int Compare(PositionInfo x, PositionInfo y)
+            {
+                if (x is null) return y is null ? 0 : -1;
+
+                if (y is null) return 1;
+
+                if (ReferenceEquals(x, y)) return 0;
+
+                var result = x.Value - y.Value;
+                if (result != 0) return result;
+
+                result = x.X - y.X;
+                if (result != 0) return result;
+
+                return x.Y - y.Y;
+            }
+        }
+
+        private void Dump(PositionInfo[,] map, int numberLength, int xLength, int yLength)
         {
             var sb = new StringBuilder();
 
@@ -281,7 +283,7 @@ namespace LeetCode.P4
 
                     if (y > 0) sb.Append(", ");
 
-                    sb.AppendFormat("{0,5}", p.Value).Append(':').AppendFormat("{0,5}", p.Height);
+                    sb.AppendFormat($"{{0,{numberLength}}}", p.Value).Append(':').AppendFormat($"{{0,{numberLength}}}", p.Value >= p.Height ? 0 : p.Height);
                 }
 
                 sb.Append('}');

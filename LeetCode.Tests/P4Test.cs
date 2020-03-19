@@ -102,6 +102,18 @@ namespace LeetCode.Tests
             };
             yield return new object[]
             {
+                10, new[]
+                {
+                    new[] {14, 20, 11, 19, 19, 16},
+                    new[] {11, 10, 7, 4, 9, 6},
+                    new[] {17, 2, 2, 6, 10, 9},
+                    new[] {15, 9, 2, 2, 4, 1},
+                    new[] {15, 5, 5, 5, 8, 7},
+                    new[] {14, 2, 8, 6, 10, 7}
+                }
+            };
+            yield return new object[]
+            {
                 12, new[]
                 {
                     new[] {14, 20, 11, 19, 19, 16},
@@ -130,7 +142,18 @@ namespace LeetCode.Tests
             };
             yield return new object[]
             {
-                68900, JsonConvert.DeserializeObject<int[][]>(File.ReadAllText("407.json"))
+                1592346, JsonConvert.DeserializeObject<int[][]>(File.ReadAllText("407.json"))
+            };
+            yield return new object[]
+            {
+                215, new[]
+                {
+                    new[] {9, 9, 9, 9, 9, 9, 8, 9, 9, 9, 9},
+                    new[] {9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 9},
+                    new[] {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                    new[] {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                    new[] {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9}
+                }
             };
         }
     }
