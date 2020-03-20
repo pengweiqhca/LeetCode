@@ -12,14 +12,14 @@ namespace LeetCode.P11
         {
             // printFirst() outputs "first". Do not change or remove this line.
             printFirst();
-            _evenLock.Reset();
+            _evenLock.Set();
         }
 
         public void Second(Action printSecond)
         {
             // printSecond() outputs "second". Do not change or remove this line.
             if (_evenLock.WaitOne()) printSecond();
-            _oddLock.Reset();
+            _oddLock.Set();
         }
 
         public void Third(Action printThird)
