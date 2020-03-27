@@ -156,5 +156,80 @@ namespace LeetCode.Tests
                 }
             };
         }
+
+        [Theory]
+        [MemberData(nameof(LeetCode445Data))]
+        public void LeetCode445Test(ListNode a, ListNode b, ListNode c) =>
+            Assert.Equal(c, new LeetCode445().AddTwoNumbers(a, b));
+
+        public static IEnumerable<object[]> LeetCode445Data()
+        {
+            yield return new object[]
+            {
+                new ListNode(1),
+                new ListNode(9)
+                {
+                    next = new ListNode(9)
+                    {
+                        next = new ListNode(9)
+                    }
+                },
+                new ListNode(1)
+                {
+                    next = new ListNode(0)
+                    {
+                        next = new ListNode(0)
+                        {
+                            next = new ListNode(0)
+                        }
+                    }
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(3)
+                {
+                    next = new ListNode(4)
+                    {
+                        next = new ListNode(2)
+                    }
+                },
+                new ListNode(4)
+                {
+                    next = new ListNode(6)
+                    {
+                        next = new ListNode(5)
+                    }
+                },
+                new ListNode(8)
+                {
+                    next = new ListNode(0)
+                    {
+                        next = new ListNode(7)
+                    }
+                },
+            };
+            yield return new object[]
+            {
+                new ListNode(4)
+                {
+                    next = new ListNode(2)
+                },
+                new ListNode(4)
+                {
+                    next = new ListNode(6)
+                    {
+                        next = new ListNode(5)
+                    }
+                },
+                new ListNode(5)
+                {
+                    next = new ListNode(0)
+                    {
+                        next = new ListNode(7)
+                    }
+                },
+            };
+        }
     }
 }

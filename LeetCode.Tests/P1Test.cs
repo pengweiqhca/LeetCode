@@ -26,7 +26,8 @@ namespace LeetCode.Tests
 
         [Theory]
         [MemberData(nameof(LeetCode174Data))]
-        public void LeetCode19Test(int result, int[][] dungeon) => Assert.Equal(result, new LeetCode174().CalculateMinimumHP(dungeon));
+        public void LeetCode19Test(int result, int[][] dungeon) =>
+            Assert.Equal(result, new LeetCode174().CalculateMinimumHP(dungeon));
 
         public static IEnumerable<object[]> LeetCode174Data()
         {

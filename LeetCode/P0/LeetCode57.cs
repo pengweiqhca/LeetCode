@@ -1,60 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace LeetCode.P0
 {
     public class LeetCode57
     {
-        public int[][] FindContinuousSequence(int target)
-        {
-            var max = (int)Math.Sqrt(2 * target);
-            if (max * max == target * 2) max--;
+        public int[][] Insert(int[][] intervals, int[] newInterval) => Insert2(intervals, newInterval).ToArray();
 
-            return target % 2 == 1 ? A1(target, max).ToArray() : A2(target, max).ToArray();
-        }
-        private IEnumerable<int[]> A1(int target, int max)
+        private IEnumerable<int[]> Insert2(int[][] intervals, int[] newInterval)
         {
-            for (var num = max % 2 == 0 ? max - 1 : max; num >= 3; num--)
+            var state = -1; //<0：未匹配；0：正在跨区匹配；>0：已匹配
+            foreach (var interval in intervals)
             {
-                var index = target / num;
-                if (target % num == 0)
+                if (state < 0)
                 {
-                    if (index % 2 == 1 && num % 2 == 1)
-                        yield return FillArray(index - num / 2, num);
+                    if (newInterval[0] < interval[0])
+                    {
+                        if (newInterval[1] < interval[0])
+                        {
+                            state = 1;
+                            yield return newInterval; //当前区间左边
+                            yield return interval;
+                        }
+                        else if (newInterval[1] <= interval[1])
+                        {
+                            state = 1;
+                            yield return new[] { newInterval[0], interval[1] }; //左边合并
+                        }
+                        else state = 0;
+                    }
+                    else if (newInterval[0] <= interval[1])
+                    {
+                        if (newInterval[1] <= interval[1])
+                        {
+                            state = 1;
+                            yield return interval; //被当前区间包含
+                        }
+                        else
+                        {
+                            state = 0;
+                            newInterval[0] = interval[0]; //当前区间包含新区间起点
+                        }
+                    }
+                    else yield return interval; //在当前区间右边
                 }
-                else if (target % num * 2 == num)
-                    yield return FillArray(index - num / 2 + 1, num);
-            }
-
-            yield return Enumerable.Range(target / 2, 2).ToArray();
-        }
-
-        private int[] FillArray(int start, int num)
-        {
-            var array = new int[num];
-            for (var index = 0; index < num; index++)
-            {
-                array[index] = start + index;
-            }
-
-            return array;
-        }
-
-        private IEnumerable<int[]> A2(int target, int max)
-        {
-            for (var num = max; num >= 3; num--)
-            {
-                var index = target / num;
-                if (target % num == 0)
+                else if (state == 0)
                 {
-                    if (num % 2 == 1 && index % 2 == 0)
-                        yield return FillArray(index - num / 2, num);
-
+                    if (newInterval[1] < interval[0])
+                    {
+                        state = 1;
+                        yield return newInterval; //当前区左边
+                        yield return interval;
+                    }
+                    else if (newInterval[1] <= interval[1])
+                    {
+                        state = 1;
+                        yield return new[] { newInterval[0], interval[1] }; //左边合并
+                    }
                 }
-                else if (target % num * 2 == num)
-                    yield return FillArray(index - num / 2 + 1, num);
+                else yield return interval;
             }
+
+            if (state < 1) yield return newInterval;
         }
     }
 }

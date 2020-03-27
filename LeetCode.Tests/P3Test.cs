@@ -8,6 +8,7 @@ namespace LeetCode.Tests
         [Theory]
         [InlineData("abc", "bcabc")]
         [InlineData("acdb", "cbacdcbc")]
-        public void LeetCode316Test(string result, string s) => Assert.Equal(result, new LeetCode316().RemoveDuplicateLetters(s));
+        public void LeetCode316Test(string result, string s) =>
+            Assert.Equal(result, new LeetCode316().RemoveDuplicateLetters(s));
     }
 }
