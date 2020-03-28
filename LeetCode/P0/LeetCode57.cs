@@ -7,7 +7,7 @@ namespace LeetCode.P0
     {
         public int[][] Insert(int[][] intervals, int[] newInterval) => Insert2(intervals, newInterval).ToArray();
 
-        private IEnumerable<int[]> Insert2(int[][] intervals, int[] newInterval)
+        private static IEnumerable<int[]> Insert2(int[][] intervals, int[] newInterval)
         {
             var state = -1; //<0：未匹配；0：正在跨区匹配；>0：已匹配
             foreach (var interval in intervals)

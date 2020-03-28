@@ -25,6 +25,15 @@ namespace LeetCode.Tests
             Assert.Equal(result, new LeetCode164().MaximumGap(nums));
 
         [Theory]
+        [InlineData(-1, "0.1", "1.1")]
+        [InlineData(1, "1.0.1", "1")]
+        [InlineData(-1, "7.5.2.4", "7.5.3")]
+        [InlineData(0, "1.01", "1.001")]
+        [InlineData(0, "1.0.0", "1.0.0.0")]
+        public void LeetCode165Test(int result, string version1, string version2) =>
+            Assert.Equal(result, new LeetCode165().CompareVersion(version1, version2));
+
+        [Theory]
         [MemberData(nameof(LeetCode174Data))]
         public void LeetCode19Test(int result, int[][] dungeon) =>
             Assert.Equal(result, new LeetCode174().CalculateMinimumHP(dungeon));

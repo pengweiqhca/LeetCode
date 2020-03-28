@@ -100,6 +100,16 @@ namespace LeetCode.Tests
         }
 
         [Theory]
+        [InlineData("0-1 ", 0)]
+        [InlineData(" 42 ", 42)]
+        [InlineData(" -42 ", -42)]
+        [InlineData("4193 with words", 4193)]
+        [InlineData("words and 987", 0)]
+        [InlineData("-91283472332 ", -2147483648)]
+        public static void LeetCode8Test(string s, int result) =>
+            Assert.Equal(result, new LeetCode8().MyAtoi(s));
+
+        [Theory]
         [InlineData(false, "a", "")]
         [InlineData(false, "", ".")]
         [InlineData(false, "aa", "a")]
@@ -672,5 +682,31 @@ namespace LeetCode.Tests
             yield return new object[] { new[] { new[] { 9, 10, 11, 12, 13, 14, 15, 16 }, new[] { 18, 19, 20, 21, 22 } }, 100 };
             yield return new object[] { new[] { new[] { 13, 14, 15, 16, 17, 18 }, new[] { 30, 31, 32 }, new[] { 46, 47 } }, 93 };
         }
+
+        [Theory]
+        [InlineData("     ", false)]
+        [InlineData(".", false)]
+        [InlineData("+", false)]
+        [InlineData("-", false)]
+        [InlineData("e", false)]
+        [InlineData("0", true)]
+        [InlineData(" 0.1 ", true)]
+        [InlineData("abc", false)]
+        [InlineData("1 a", false)]
+        [InlineData("2e10", true)]
+        [InlineData("2e-", false)]
+        [InlineData("..2", false)]
+        [InlineData(" -90e3   ", true)]
+        [InlineData(" 1e", false)]
+        [InlineData("e3", false)]
+        [InlineData(" 6e-1", true)]
+        [InlineData(" 99e2.5 ", false)]
+        [InlineData("53.5e93", true)]
+        [InlineData(" --6 ", false)]
+        [InlineData("-+3", false)]
+        [InlineData("95a54e53", false)]
+        [InlineData(" 005047e+6", true)]
+        public static void LeetCode65Test(string s, bool result) =>
+            Assert.Equal(result, new LeetCode65().IsNumber(s));
     }
 }
