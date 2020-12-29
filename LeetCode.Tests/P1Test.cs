@@ -25,6 +25,20 @@ namespace LeetCode.Tests
             Assert.Equal(result, new LeetCode164().MaximumGap(nums));
 
         [Theory]
+        [InlineData(new int[0], new int[0])]
+        [InlineData(new[] { 0 }, new[] { 1 })]
+        [InlineData(new[] { 0 }, new[] { 2, 1 })]
+        [InlineData(new[] { 1 }, new[] { 1, 2 })]
+        [InlineData(new[] { 0 }, new[] { 2, 1, 0 })]
+        [InlineData(new[] { 1 }, new[] { 1, 2, 1 })]
+        [InlineData(new[] { 2 }, new[] { 1, 2, 3 })]
+        [InlineData(new[] { 0, 2 }, new[] { 2, 1, 2 })]
+        [InlineData(new[] { 2 }, new[] { 1, 2, 3, 1 })]
+        [InlineData(new[] { 1, 5 }, new[] { 1, 2, 1, 3, 5, 6, 4 })]
+        public void LeetCode162Test(int[] result, int[] nums) =>
+            Assert.Equal(result, new LeetCode162().FindPeakElements(nums));
+
+        [Theory]
         [InlineData(-1, "0.1", "1.1")]
         [InlineData(1, "1.0.1", "1")]
         [InlineData(-1, "7.5.2.4", "7.5.3")]
